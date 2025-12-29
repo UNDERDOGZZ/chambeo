@@ -9,32 +9,48 @@ class AuthWelcomeScreen extends StatefulWidget {
 }
 
 class _AuthWelcomeScreenState extends State<AuthWelcomeScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
+    with TickerProviderStateMixin {
+  late final AnimationController _logoController;
+  late final AnimationController _elementController;
   late final Animation<double> _scaleAnimation;
   late final Animation<double> _fadeAnimation;
-  late final Animation<double> _rotationAnimation;
+  late final Animation<double> _pulseAnimation;
+  late final Animation<double> _ringAnimation;
+  late final Animation<double> _iconRotateAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _logoController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 900),
     );
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+    _elementController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
     );
-    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-    _rotationAnimation = Tween<double>(begin: -0.03, end: 0.03).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.easeOutBack),
     );
-    _controller.repeat(reverse: true, period: const Duration(milliseconds: 2000));
+    _fadeAnimation =
+        CurvedAnimation(parent: _logoController, curve: Curves.easeOut);
+    _pulseAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
+      CurvedAnimation(parent: _elementController, curve: Curves.easeInOut),
+    );
+    _ringAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _elementController, curve: Curves.easeOut),
+    );
+    _iconRotateAnimation = Tween<double>(begin: -0.08, end: 0.08).animate(
+      CurvedAnimation(parent: _elementController, curve: Curves.easeInOut),
+    );
+    _logoController.forward();
+    _elementController.repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _logoController.dispose();
+    _elementController.dispose();
     super.dispose();
   }
 
@@ -59,72 +75,127 @@ class _AuthWelcomeScreenState extends State<AuthWelcomeScreen>
                   opacity: _fadeAnimation,
                   child: ScaleTransition(
                     scale: _scaleAnimation,
-                    child: RotationTransition(
-                      turns: _rotationAnimation,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            width: 120,
-                            height: 120,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Container(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: 140,
+                          height: 140,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              AnimatedBuilder(
+                                animation: _ringAnimation,
+                                builder: (context, child) {
+                                  final scale = 1 + (_ringAnimation.value * 0.12);
+                                  final opacity = 0.2 - (_ringAnimation.value * 0.15);
+                                  return Transform.scale(
+                                    scale: scale,
+                                    child: Container(
+                                      width: 140,
+                                      height: 140,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: Colors.white.withOpacity(opacity),
+                                          width: 2,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              AnimatedBuilder(
+                                animation: _pulseAnimation,
+                                builder: (context, child) {
+                                  return Transform.scale(
+                                    scale: _pulseAnimation.value,
+                                    child: child,
+                                  );
+                                },
+                                child: Container(
                                   width: 120,
                                   height: 120,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.white.withOpacity(0.2),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.white.withOpacity(0.2),
+                                        Colors.white.withOpacity(0.05),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Colors.black.withOpacity(0.25),
                                         blurRadius: 24,
                                         offset: const Offset(0, 12),
                                       ),
                                     ],
                                   ),
                                 ),
-                                const Icon(Icons.bolt,
-                                    size: 60, color: Colors.white),
-                                Positioned(
-                                  top: 10,
-                                  right: 18,
+                              ),
+                              RotationTransition(
+                                turns: _iconRotateAnimation,
+                                child: const Icon(Icons.bolt,
+                                    size: 64, color: Colors.white),
+                              ),
+                              Positioned(
+                                top: 8,
+                                right: 20,
+                                child: AnimatedBuilder(
+                                  animation: _pulseAnimation,
+                                  builder: (context, child) {
+                                    return Transform.translate(
+                                      offset: Offset(0, -4 * _pulseAnimation.value),
+                                      child: child,
+                                    );
+                                  },
                                   child: Container(
-                                    padding: const EdgeInsets.all(6),
+                                    padding: const EdgeInsets.all(7),
                                     decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: Colors.white,
                                     ),
                                     child: const Icon(Icons.handshake_outlined,
-                                        size: 16, color: Color(0xFF0072FF)),
+                                        size: 18, color: Color(0xFF0072FF)),
                                   ),
                                 ),
-                                Positioned(
-                                  bottom: 14,
-                                  left: 16,
+                              ),
+                              Positioned(
+                                bottom: 12,
+                                left: 18,
+                                child: AnimatedBuilder(
+                                  animation: _pulseAnimation,
+                                  builder: (context, child) {
+                                    return Transform.translate(
+                                      offset: Offset(0, 4 * _pulseAnimation.value),
+                                      child: child,
+                                    );
+                                  },
                                   child: Container(
-                                    padding: const EdgeInsets.all(6),
+                                    padding: const EdgeInsets.all(7),
                                     decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: Colors.white,
                                     ),
                                     child: const Icon(Icons.home_repair_service,
-                                        size: 16, color: Color(0xFF7C4DFF)),
+                                        size: 18, color: Color(0xFF7C4DFF)),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Chambeo',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.copyWith(color: Colors.white),
-                          ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Chambeo',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(color: Colors.white),
+                        ),
+                      ],
                     ),
                   ),
                 ),
