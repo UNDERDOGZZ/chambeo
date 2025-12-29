@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'routing/app_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,25 +21,22 @@ Future<void> main() async {
     anonKey: supabaseAnonKey,
   );
 
-  runApp(const ChambaApp());
+  runApp(const ProviderScope(child: ChambaApp()));
 }
 
-class ChambaApp extends StatelessWidget {
+class ChambaApp extends ConsumerWidget {
   const ChambaApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(goRouterProvider);
+    return MaterialApp.router(
       title: 'Chamba Exprés',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Chamba Exprés'),
-        ),
-      ),
+      routerConfig: router,
     );
   }
 }
