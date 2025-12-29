@@ -17,7 +17,7 @@ import '../state/auth_state.dart';
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/splash',
-    refreshListenable: GoRouterRefreshStream(
+    refreshListenable: RouterRefreshNotifier(
       ref.watch(authStateProvider.stream),
     ),
     redirect: (context, state) {
@@ -84,3 +84,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+class RouterRefreshNotifier extends ChangeNotifier {
+  RouterRefreshNotifier(Stream<dynamic> stream) {
+    _subscription = stream.listen((_) {
+      notifyListeners();
+    });
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
