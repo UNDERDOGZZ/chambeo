@@ -19,7 +19,7 @@ import '../state/auth_state.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/splash',
+    initialLocation: '/auth/phone',
     refreshListenable: RouterRefreshNotifier(
       ref.watch(authStateProvider.stream),
     ),

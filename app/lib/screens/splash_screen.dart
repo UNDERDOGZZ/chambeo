@@ -31,9 +31,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final profileAsync = ref.watch(profileProvider);
+    return Scaffold(
       body: Center(
-        child: CircularProgressIndicator(),
+        child: profileAsync.when(
+          data: (_) => const CircularProgressIndicator(),
+          loading: () => const CircularProgressIndicator(),
+          error: (_, __) => const Text('Error cargando perfil'),
+        ),
       ),
     );
   }
