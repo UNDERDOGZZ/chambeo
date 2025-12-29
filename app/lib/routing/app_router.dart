@@ -50,7 +50,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/auth/otp',
-        builder: (context, state) => const AuthOtpScreen(),
+        builder: (context, state) => AuthOtpScreen(
+          phone: state.uri.queryParameters['phone'] ?? '',
+        ),
       ),
       GoRoute(
         path: '/profile/setup',
