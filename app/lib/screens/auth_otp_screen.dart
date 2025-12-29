@@ -1,13 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthOtpScreen extends StatefulWidget {
-  const AuthOtpScreen({super.key, required this.phone});
-
-  final String phone;
+  const AuthOtpScreen({super.key});
 
   @override
   State<AuthOtpScreen> createState() => _AuthOtpScreenState();
@@ -15,13 +10,12 @@ class AuthOtpScreen extends StatefulWidget {
 
 class _AuthOtpScreenState extends State<AuthOtpScreen>
     with SingleTickerProviderStateMixin {
-  final _otpController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   late final AnimationController _animationController;
   late final Animation<double> _fadeAnimation;
   late final Animation<Offset> _slideAnimation;
-  Timer? _timer;
   bool _isLoading = false;
-  int _secondsRemaining = 30;
   String? _errorMessage;
 
   @override
@@ -42,69 +36,22 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
     _animationController.forward();
-    _startTimer();
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _otpController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
-  void _startTimer() {
-    _timer?.cancel();
-    setState(() {
-      _secondsRemaining = 30;
-    });
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_secondsRemaining <= 1) {
-        timer.cancel();
-      }
+  Future<void> _signUp() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    if (email.isEmpty || password.length < 6) {
       setState(() {
-        _secondsRemaining = (_secondsRemaining - 1).clamp(0, 30);
-      });
-    });
-  }
-
-  Future<void> _resendOtp() async {
-    if (_secondsRemaining > 0) return;
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-    try {
-      await Supabase.instance.client.auth.signInWithOtp(phone: widget.phone);
-      _startTimer();
-    } on AuthException catch (error) {
-      setState(() {
-        _errorMessage = error.message;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.message)),
-      );
-    } catch (_) {
-      setState(() {
-        _errorMessage = 'Error reenviando el código';
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error reenviando el código')),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _verifyOtp() async {
-    final token = _otpController.text.trim();
-    if (token.length != 6) {
-      setState(() {
-        _errorMessage = 'Ingresa el código de 6 dígitos';
+        _errorMessage = 'Ingresa un correo y contraseña (mín. 6 caracteres)';
       });
       return;
     }
@@ -115,10 +62,9 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
     });
 
     try {
-      await Supabase.instance.client.auth.verifyOTP(
-        type: OtpType.sms,
-        phone: widget.phone,
-        token: token,
+      await Supabase.instance.client.auth.signUp(
+        email: email,
+        password: password,
       );
     } on AuthException catch (error) {
       if (!mounted) return;
@@ -131,10 +77,10 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _errorMessage = 'Error verificando el código';
+        _errorMessage = 'Error creando la cuenta';
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error verificando el código')),
+        const SnackBar(content: Text('Error creando la cuenta')),
       );
     } finally {
       if (mounted) {
@@ -159,28 +105,27 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Código enviado a',
-                    style: Theme.of(context).textTheme.titleSmall,
+                    'Crea tu cuenta',
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    widget.phone,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   TextField(
-                    controller: _otpController,
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    maxLength: 6,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(6),
-                    ],
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
-                      counterText: '',
-                      hintText: '000000',
+                      hintText: 'tu@correo.com',
                       border: OutlineInputBorder(),
+                      labelText: 'Correo',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      hintText: '••••••••',
+                      border: OutlineInputBorder(),
+                      labelText: 'Contraseña',
                     ),
                   ),
                   if (_errorMessage != null) ...[
@@ -190,27 +135,18 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
                       style: TextStyle(color: Theme.of(context).colorScheme.error),
                     ),
                   ],
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   SizedBox(
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _verifyOtp,
+                      onPressed: _isLoading ? null : _signUp,
                       child: _isLoading
                           ? const SizedBox(
                               height: 24,
                               width: 24,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Confirmar'),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: _isLoading ? null : _resendOtp,
-                    child: Text(
-                      _secondsRemaining > 0
-                          ? 'Reenviar en ${_secondsRemaining}s'
-                          : 'Reenviar código',
+                          : const Text('Registrarse'),
                     ),
                   ),
                 ],

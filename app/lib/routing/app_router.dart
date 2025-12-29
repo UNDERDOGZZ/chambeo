@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../screens/auth_phone_screen.dart';
 import '../screens/auth_otp_screen.dart';
+import '../screens/auth_welcome_screen.dart';
 import '../screens/profile_setup_screen.dart';
 import '../screens/splash_screen.dart';
 import '../screens/home_screen.dart';
@@ -20,7 +21,7 @@ import '../screens/error_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/auth/phone',
+    initialLocation: '/auth/welcome',
     refreshListenable: RouterRefreshNotifier(
       ref.watch(authStateProvider.stream),
     ),
@@ -30,11 +31,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final hasSession = session != null;
       final location = state.uri.toString();
 
-      if (!hasSession && location != '/auth/phone' && location != '/auth/otp') {
-        return '/auth/phone';
+      if (!hasSession &&
+          location != '/auth/welcome' &&
+          location != '/auth/phone' &&
+          location != '/auth/otp') {
+        return '/auth/welcome';
       }
 
-      if (hasSession && (location == '/auth/phone' || location == '/auth/otp')) {
+      if (hasSession &&
+          (location == '/auth/welcome' ||
+              location == '/auth/phone' ||
+              location == '/auth/otp')) {
         return '/splash';
       }
 
@@ -49,31 +56,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
+        path: '/auth/welcome',
+        builder: (context, state) => const AuthWelcomeScreen(),
+      ),
+      GoRoute(
         path: '/auth/phone',
         builder: (context, state) => const AuthPhoneScreen(),
       ),
       GoRoute(
         path: '/auth/otp',
-        pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: AuthOtpScreen(
-            phone: state.uri.queryParameters['phone'] ?? '',
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            final fade = CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeInOut,
-            );
-            final slide = Tween<Offset>(
-              begin: const Offset(0, 0.03),
-              end: Offset.zero,
-            ).animate(fade);
-            return FadeTransition(
-              opacity: fade,
-              child: SlideTransition(position: slide, child: child),
-            );
-          },
-        ),
+        builder: (context, state) => const AuthOtpScreen(),
       ),
       GoRoute(
         path: '/profile/setup',

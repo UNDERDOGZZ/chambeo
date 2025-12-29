@@ -11,7 +11,8 @@ class AuthPhoneScreen extends StatefulWidget {
 
 class _AuthPhoneScreenState extends State<AuthPhoneScreen>
     with SingleTickerProviderStateMixin {
-  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   late final AnimationController _animationController;
   late final Animation<double> _fadeAnimation;
   late final Animation<Offset> _slideAnimation;
@@ -40,16 +41,18 @@ class _AuthPhoneScreenState extends State<AuthPhoneScreen>
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
-  Future<void> _sendOtp() async {
-    final phone = '+51${_phoneController.text.trim()}';
-    if (_phoneController.text.trim().isEmpty) {
+  Future<void> _signIn() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    if (email.isEmpty || password.isEmpty) {
       setState(() {
-        _errorMessage = 'Ingresa tu número de teléfono';
+        _errorMessage = 'Ingresa correo y contraseña';
       });
       return;
     }
@@ -60,9 +63,10 @@ class _AuthPhoneScreenState extends State<AuthPhoneScreen>
     });
 
     try {
-      await Supabase.instance.client.auth.signInWithOtp(phone: phone);
-      if (!mounted) return;
-      context.go('/auth/otp?phone=${Uri.encodeComponent(phone)}');
+      await Supabase.instance.client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
     } on AuthException catch (error) {
       if (!mounted) return;
       setState(() {
@@ -74,10 +78,10 @@ class _AuthPhoneScreenState extends State<AuthPhoneScreen>
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _errorMessage = 'Error enviando el código';
+        _errorMessage = 'Error iniciando sesión';
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error enviando el código')),
+        const SnackBar(content: Text('Error iniciando sesión')),
       );
     } finally {
       if (mounted) {
@@ -106,7 +110,7 @@ class _AuthPhoneScreenState extends State<AuthPhoneScreen>
                       const Icon(Icons.work_outline, size: 32),
                       const SizedBox(width: 12),
                       Text(
-                        'Chamba Exprés',
+                        'Chambeo',
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ],
@@ -117,36 +121,29 @@ class _AuthPhoneScreenState extends State<AuthPhoneScreen>
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 32),
+                  Text('Correo', style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      hintText: 'tu@correo.com',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Text(
-                    'Tu teléfono',
+                    'Contraseña',
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                   const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 14,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade400),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text('+51'),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          controller: _phoneController,
-                          keyboardType: TextInputType.phone,
-                          decoration: const InputDecoration(
-                            hintText: '999 888 777',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                    ],
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      hintText: '••••••••',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 8),
@@ -159,15 +156,21 @@ class _AuthPhoneScreenState extends State<AuthPhoneScreen>
                   SizedBox(
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _sendOtp,
+                      onPressed: _isLoading ? null : _signIn,
                       child: _isLoading
                           ? const SizedBox(
                               height: 24,
                               width: 24,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Enviar código'),
+                          : const Text('Iniciar sesión'),
                     ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed:
+                        _isLoading ? null : () => context.go('/auth/otp'),
+                    child: const Text('Crear cuenta'),
                   ),
                   const Spacer(),
                   Text(

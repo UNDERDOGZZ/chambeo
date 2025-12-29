@@ -37,7 +37,7 @@ class ChambaApp extends ConsumerWidget {
 
     if (!isConfigured) {
       return MaterialApp(
-        title: 'Chamba Exprés',
+        title: 'Chambeo',
         theme: theme,
         home: const Scaffold(
           body: Center(
@@ -49,7 +49,7 @@ class ChambaApp extends ConsumerWidget {
 
     final router = ref.watch(goRouterProvider);
     return MaterialApp.router(
-      title: 'Chamba Exprés',
+      title: 'Chambeo',
       theme: theme,
       routerConfig: router,
     );
