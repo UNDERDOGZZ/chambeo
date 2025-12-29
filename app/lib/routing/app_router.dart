@@ -16,6 +16,7 @@ import '../screens/job_offer_send_screen.dart';
 import '../screens/job_room_screen.dart';
 import '../screens/job_rate_screen.dart';
 import '../state/auth_state.dart';
+import '../screens/error_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -39,6 +40,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       return null;
     },
+    errorBuilder: (context, state) => ErrorScreen(
+      message: state.error?.toString() ?? 'Ruta no encontrada',
+    ),
     routes: [
       GoRoute(
         path: '/splash',
