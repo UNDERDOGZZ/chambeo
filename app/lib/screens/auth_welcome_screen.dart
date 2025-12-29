@@ -63,21 +63,57 @@ class _AuthWelcomeScreenState extends State<AuthWelcomeScreen>
                       turns: _rotationAnimation,
                       child: Column(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.2),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
+                          SizedBox(
+                            width: 120,
+                            height: 120,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                  width: 120,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white.withOpacity(0.2),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 24,
+                                        offset: const Offset(0, 12),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Icon(Icons.bolt,
+                                    size: 60, color: Colors.white),
+                                Positioned(
+                                  top: 10,
+                                  right: 18,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                    ),
+                                    child: const Icon(Icons.handshake_outlined,
+                                        size: 16, color: Color(0xFF0072FF)),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 14,
+                                  left: 16,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                    ),
+                                    child: const Icon(Icons.home_repair_service,
+                                        size: 16, color: Color(0xFF7C4DFF)),
+                                  ),
                                 ),
                               ],
                             ),
-                            child: const Icon(Icons.work_outline,
-                                size: 72, color: Colors.white),
                           ),
                           const SizedBox(height: 12),
                           Text(

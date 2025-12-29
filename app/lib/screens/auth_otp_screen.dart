@@ -124,6 +124,7 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F8FA),
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -135,8 +136,11 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Crea tu cuenta',
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    'Crear cuenta',
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 16),
                   TextField(
@@ -146,6 +150,8 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
                       hintText: 'Nombres completos',
                       border: OutlineInputBorder(),
                       labelText: 'Nombres',
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -156,6 +162,8 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
                       hintText: 'Apellidos',
                       border: OutlineInputBorder(),
                       labelText: 'Apellidos',
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -170,6 +178,8 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
                       hintText: '12345678',
                       border: OutlineInputBorder(),
                       labelText: 'DNI (8 dígitos)',
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -180,6 +190,8 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
                       hintText: 'DD/MM/AAAA',
                       border: OutlineInputBorder(),
                       labelText: 'Fecha de nacimiento',
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -190,6 +202,8 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
                       hintText: 'tu@correo.com',
                       border: OutlineInputBorder(),
                       labelText: 'Correo',
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -204,6 +218,8 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
                       hintText: '999888777',
                       border: OutlineInputBorder(),
                       labelText: 'Número de teléfono',
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -214,6 +230,8 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
                       hintText: '••••••••',
                       border: OutlineInputBorder(),
                       labelText: 'Contraseña',
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                   ),
                   if (_errorMessage != null) ...[
@@ -227,6 +245,10 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
                   SizedBox(
                     height: 52,
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF101828),
+                        foregroundColor: Colors.white,
+                      ),
                       onPressed: _isLoading ? null : _signUp,
                       child: _isLoading
                           ? const SizedBox(

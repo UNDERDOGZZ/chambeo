@@ -95,6 +95,7 @@ class _AuthPhoneScreenState extends State<AuthPhoneScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F8FA),
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -105,44 +106,43 @@ class _AuthPhoneScreenState extends State<AuthPhoneScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.work_outline, size: 32),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Chambeo',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
                   Text(
-                    'Encuentra ayuda cerca. Gana hoy.',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    'Bienvenido',
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Inicia sesión en Chambeo',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: Colors.black54),
                   ),
                   const SizedBox(height: 32),
-                  Text('Correo', style: Theme.of(context).textTheme.titleSmall),
-                  const SizedBox(height: 8),
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
+                      labelText: 'Correo',
                       hintText: 'tu@correo.com',
                       border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'Contraseña',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 8),
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
                     decoration: const InputDecoration(
+                      labelText: 'Contraseña',
                       hintText: '••••••••',
                       border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                   ),
                   if (_errorMessage != null) ...[
@@ -156,6 +156,10 @@ class _AuthPhoneScreenState extends State<AuthPhoneScreen>
                   SizedBox(
                     height: 52,
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF101828),
+                        foregroundColor: Colors.white,
+                      ),
                       onPressed: _isLoading ? null : _signIn,
                       child: _isLoading
                           ? const SizedBox(
@@ -176,7 +180,10 @@ class _AuthPhoneScreenState extends State<AuthPhoneScreen>
                   Text(
                     'Al continuar aceptas Términos y Privacidad',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: Colors.black45),
                   ),
                 ],
               ),
