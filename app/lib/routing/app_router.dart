@@ -54,8 +54,25 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/auth/otp',
-        builder: (context, state) => AuthOtpScreen(
-          phone: state.uri.queryParameters['phone'] ?? '',
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: AuthOtpScreen(
+            phone: state.uri.queryParameters['phone'] ?? '',
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final fade = CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeInOut,
+            );
+            final slide = Tween<Offset>(
+              begin: const Offset(0, 0.03),
+              end: Offset.zero,
+            ).animate(fade);
+            return FadeTransition(
+              opacity: fade,
+              child: SlideTransition(position: slide, child: child),
+            );
+          },
         ),
       ),
       GoRoute(
