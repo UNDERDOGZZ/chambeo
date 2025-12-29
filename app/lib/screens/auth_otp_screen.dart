@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthOtpScreen extends StatefulWidget {
@@ -12,6 +13,11 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
     with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _dniController = TextEditingController();
+  final _birthDateController = TextEditingController();
+  final _phoneController = TextEditingController();
   late final AnimationController _animationController;
   late final Animation<double> _fadeAnimation;
   late final Animation<Offset> _slideAnimation;
@@ -42,6 +48,11 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _dniController.dispose();
+    _birthDateController.dispose();
+    _phoneController.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -49,9 +60,21 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
   Future<void> _signUp() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
-    if (email.isEmpty || password.length < 6) {
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    final dni = _dniController.text.trim();
+    final birthDate = _birthDateController.text.trim();
+    final phone = _phoneController.text.trim();
+    if (firstName.isEmpty ||
+        lastName.isEmpty ||
+        dni.length != 8 ||
+        birthDate.isEmpty ||
+        email.isEmpty ||
+        phone.isEmpty ||
+        password.length < 6) {
       setState(() {
-        _errorMessage = 'Ingresa un correo y contraseña (mín. 6 caracteres)';
+        _errorMessage =
+            'Completa todos los campos. DNI: 8 dígitos, contraseña mín. 6.';
       });
       return;
     }
@@ -65,6 +88,13 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
       await Supabase.instance.client.auth.signUp(
         email: email,
         password: password,
+        data: {
+          'first_name': firstName,
+          'last_name': lastName,
+          'dni': dni,
+          'birth_date': birthDate,
+          'phone': phone,
+        },
       );
     } on AuthException catch (error) {
       if (!mounted) return;
@@ -110,12 +140,70 @@ class _AuthOtpScreenState extends State<AuthOtpScreen>
                   ),
                   const SizedBox(height: 16),
                   TextField(
+                    controller: _firstNameController,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: const InputDecoration(
+                      hintText: 'Nombres completos',
+                      border: OutlineInputBorder(),
+                      labelText: 'Nombres',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _lastNameController,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: const InputDecoration(
+                      hintText: 'Apellidos',
+                      border: OutlineInputBorder(),
+                      labelText: 'Apellidos',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _dniController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(8),
+                    ],
+                    decoration: const InputDecoration(
+                      hintText: '12345678',
+                      border: OutlineInputBorder(),
+                      labelText: 'DNI (8 dígitos)',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _birthDateController,
+                    keyboardType: TextInputType.datetime,
+                    decoration: const InputDecoration(
+                      hintText: 'DD/MM/AAAA',
+                      border: OutlineInputBorder(),
+                      labelText: 'Fecha de nacimiento',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                       hintText: 'tu@correo.com',
                       border: OutlineInputBorder(),
                       labelText: 'Correo',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(9),
+                    ],
+                    decoration: const InputDecoration(
+                      hintText: '999888777',
+                      border: OutlineInputBorder(),
+                      labelText: 'Número de teléfono',
                     ),
                   ),
                   const SizedBox(height: 16),
